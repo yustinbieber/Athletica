@@ -14,8 +14,9 @@ function verifyToken(req: NextRequest) {
     if (!token) return null;
     const decoded = jwt.verify(token, SECRET);
     return decoded;
-  } catch (error) {
-    console.error('Token verification error:', error);
+  } catch (e: unknown) {
+    const error = e as Error;
+    console.error('Token verification error:', error.message);
     return null;
   }
 }
@@ -38,8 +39,9 @@ export async function GET(req: NextRequest) {
   try {
     const gimnasios = await Gimnasio.find();
     return NextResponse.json(gimnasios);
-  } catch (error) {
-    console.error('Error al obtener gimnasios:', error);
+  } catch (e: unknown) {
+    const error = e as Error;
+    console.error('Error al obtener gimnasios:', error.message);
     return NextResponse.json({ error: 'Error al obtener gimnasios' }, { status: 500 });
   }
 }
@@ -61,8 +63,9 @@ export async function POST(req: NextRequest) {
 
     const nuevoGimnasio = await Gimnasio.create(data);
     return NextResponse.json(nuevoGimnasio, { status: 201 });
-  } catch (error) {
-    console.error('Error al crear el gimnasio:', error);
+  } catch (e: unknown) {
+    const error = e as Error;
+    console.error('Error al crear el gimnasio:', error.message);
     return NextResponse.json({ error: 'Error al crear el gimnasio' }, { status: 500 });
   }
 }
@@ -99,8 +102,9 @@ export async function PUT(req: NextRequest) {
     }
 
     return NextResponse.json(gimnasio);
-  } catch (error) {
-    console.error('Error al editar gimnasio:', error);
+  } catch (e: unknown) {
+    const error = e as Error;
+    console.error('Error al editar gimnasio:', error.message);
     return NextResponse.json({ error: 'Error al editar gimnasio' }, { status: 500 });
   }
 }
@@ -128,8 +132,9 @@ export async function DELETE(req: NextRequest) {
     }
 
     return NextResponse.json({ message: 'Gimnasio eliminado correctamente' });
-  } catch (error) {
-    console.error('Error al eliminar gimnasio:', error);
+  } catch (e: unknown) {
+    const error = e as Error;
+    console.error('Error al eliminar gimnasio:', error.message);
     return NextResponse.json({ error: 'Error al eliminar gimnasio' }, { status: 500 });
   }
 }

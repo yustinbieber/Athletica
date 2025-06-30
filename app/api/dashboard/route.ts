@@ -1,4 +1,3 @@
-// app/api/dashboard/route.ts
 import { NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import Gimnasio from '@/models/Gimnasio';
@@ -12,9 +11,9 @@ function verifyToken(req: Request) {
     if (!authHeader) return null;
     const token = authHeader.split(' ')[1];
     return jwt.verify(token, SECRET);
-  } catch (error) {
-    // Log para debugging (opcional)
-    console.error('Error verificando token:', error);
+  } catch (e: unknown) {
+    const error = e as Error;
+    console.error('Error verificando token:', error.message);
     return null;
   }
 }
@@ -32,8 +31,9 @@ export async function GET(req: Request) {
     const activos = await Gimnasio.countDocuments({ activo: true });
 
     return NextResponse.json({ totalGimnasios, activos });
-  } catch (error) {
-    console.error('Error en GET /api/dashboard:', error);
+  } catch (e: unknown) {
+    const error = e as Error;
+    console.error('Error en GET /api/dashboard:', error.message);
     return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
   }
 }

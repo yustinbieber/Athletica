@@ -13,8 +13,9 @@ function verifyToken(req: NextRequest) {
     if (!token) return null;
     const decoded = jwt.verify(token, SECRET);
     return decoded;
-  } catch (error) {
-    console.error('Token verification failed:', error);
+  } catch (e: unknown) {
+    const error = e as Error;
+    console.error('Token verification failed:', error.message);
     return null;
   }
 }
@@ -28,8 +29,9 @@ export async function GET(req: NextRequest) {
   try {
     const planes = await Plan.find();
     return NextResponse.json(planes);
-  } catch (error) {
-    console.error('Error fetching plans:', error);
+  } catch (e: unknown) {
+    const error = e as Error;
+    console.error('Error fetching plans:', error.message);
     return NextResponse.json({ error: 'Error al obtener planes' }, { status: 500 });
   }
 }
@@ -53,8 +55,9 @@ export async function POST(req: NextRequest) {
       duracionDias: data.duracionDias,
     });
     return NextResponse.json(nuevoPlan, { status: 201 });
-  } catch (error) {
-    console.error('Error creating plan:', error);
+  } catch (e: unknown) {
+    const error = e as Error;
+    console.error('Error creating plan:', error.message);
     return NextResponse.json({ error: 'Error al crear plan' }, { status: 500 });
   }
 }
@@ -85,8 +88,9 @@ export async function PUT(req: NextRequest) {
     if (!plan) return NextResponse.json({ error: 'Plan no encontrado' }, { status: 404 });
 
     return NextResponse.json(plan);
-  } catch (error) {
-    console.error('Error updating plan:', error);
+  } catch (e: unknown) {
+    const error = e as Error;
+    console.error('Error updating plan:', error.message);
     return NextResponse.json({ error: 'Error al actualizar plan' }, { status: 500 });
   }
 }
@@ -106,8 +110,9 @@ export async function DELETE(req: NextRequest) {
     if (!plan) return NextResponse.json({ error: 'Plan no encontrado' }, { status: 404 });
 
     return NextResponse.json({ message: 'Plan eliminado correctamente' });
-  } catch (error) {
-    console.error('Error deleting plan:', error);
+  } catch (e: unknown) {
+    const error = e as Error;
+    console.error('Error deleting plan:', error.message);
     return NextResponse.json({ error: 'Error al eliminar plan' }, { status: 500 });
   }
 }

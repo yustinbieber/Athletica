@@ -7,8 +7,9 @@ export async function GET() {
   try {
     const mercaderias = await Mercaderia.find();
     return NextResponse.json(mercaderias);
-  } catch (error) {
-    console.error('Error al obtener mercadería:', error);
+  } catch (e: unknown) {
+    const error = e as Error;
+    console.error('Error al obtener mercadería:', error.message);
     return NextResponse.json({ error: 'Error al obtener mercadería' }, { status: 500 });
   }
 }
@@ -27,8 +28,9 @@ export async function POST(req: NextRequest) {
       precioUnitario: data.precioUnitario,
     });
     return NextResponse.json(nuevaMercaderia, { status: 201 });
-  } catch (error) {
-    console.error('Error al crear mercadería:', error);
+  } catch (e: unknown) {
+    const error = e as Error;
+    console.error('Error al crear mercadería:', error.message);
     return NextResponse.json({ error: 'Error al crear mercadería' }, { status: 500 });
   }
 }
@@ -58,8 +60,9 @@ export async function PUT(req: NextRequest) {
     }
 
     return NextResponse.json(mercaderiaActualizada);
-  } catch (error) {
-    console.error('Error al actualizar mercadería:', error);
+  } catch (e: unknown) {
+    const error = e as Error;
+    console.error('Error al actualizar mercadería:', error.message);
     return NextResponse.json({ error: 'Error al actualizar mercadería' }, { status: 500 });
   }
 }
@@ -79,8 +82,9 @@ export async function DELETE(req: NextRequest) {
     }
 
     return NextResponse.json({ message: 'Mercadería eliminada correctamente' });
-  } catch (error) {
-    console.error('Error al eliminar mercadería:', error);
+  } catch (e: unknown) {
+    const error = e as Error;
+    console.error('Error al eliminar mercadería:', error.message);
     return NextResponse.json({ error: 'Error al eliminar mercadería' }, { status: 500 });
   }
 }

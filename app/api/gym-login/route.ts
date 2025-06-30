@@ -40,8 +40,9 @@ export async function POST(req: NextRequest) {
     );
 
     return NextResponse.json({ token });
-  } catch (error) {
-    console.error('Error en login:', error);
+  } catch (e: unknown) {
+    const error = e as Error;
+    console.error('Error en login:', error.message);
     return NextResponse.json({ error: 'Error en el servidor' }, { status: 500 });
   }
 }

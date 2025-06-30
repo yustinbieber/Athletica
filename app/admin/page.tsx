@@ -4,7 +4,8 @@ import { useRouter } from 'next/navigation';
 
 export default function AdminPage() {
   const router = useRouter();
-  const [token, setToken] = useState<string | null>(null);
+  // Elimina token si no lo usás en ningún lado
+  // const [token, setToken] = useState<string | null>(null);
   const [activos, setActivos] = useState<number>(0);
   const [loading, setLoading] = useState(true);
 
@@ -13,10 +14,11 @@ export default function AdminPage() {
     if (!t) {
       router.push('/login');
     } else {
-      setToken(t);
+      // setToken(t);  // como token no se usa, no hace falta setearlo
       fetchEstadisticas(t);
     }
-  }, []);
+    // Agregamos router como dependencia para evitar warning
+  }, [router]);
 
   async function fetchEstadisticas(token: string) {
     try {
@@ -26,7 +28,8 @@ export default function AdminPage() {
       if (!res.ok) throw new Error('No se pudieron obtener estadísticas');
       const data = await res.json();
       setActivos(data.activos);
-    } catch {
+    } catch (e) {
+      // Cambié para capturar el error en variable e y poder hacer console.error
       console.error(e);
     } finally {
       setLoading(false);

@@ -13,18 +13,14 @@ interface MongooseCache {
 
 declare global {
   // Para que TypeScript reconozca la propiedad en global
-  // Usamos var para que sea compatible con Node y globales
-  // eslint-disable-next-line no-var
   var mongoose: MongooseCache | undefined;
 }
 
-let cached: MongooseCache;
+const cached: MongooseCache = global.mongoose ?? { conn: null, promise: null };
 
 if (!global.mongoose) {
-  global.mongoose = { conn: null, promise: null };
+  global.mongoose = cached;
 }
-
-cached = global.mongoose;
 
 async function dbConnect() {
   if (cached.conn) {

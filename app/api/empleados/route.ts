@@ -5,7 +5,7 @@ import Empleado from '@/models/Empleado';
 export async function GET(req: NextRequest) {
   await dbConnect();
   const { searchParams } = new URL(req.url);
-  const gymId = searchParams.get('gymId');
+  
   if (!gymId) return NextResponse.json({ error: 'gymId requerido' }, { status: 400 });
 
   try {

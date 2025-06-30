@@ -4,7 +4,6 @@ import { useRouter } from 'next/navigation';
 
 export default function AdminPage() {
   const router = useRouter();
-  const [, setToken] = useState<string | null>(null);
   const [activos, setActivos] = useState<number>(0);
   const [loading, setLoading] = useState(true);
 
@@ -13,7 +12,6 @@ export default function AdminPage() {
     if (!t) {
       router.push('/login');
     } else {
-      setToken(t);
       fetchEstadisticas(t);
     }
   }, [router]);

@@ -136,7 +136,7 @@ export default function GestionUsuarios() {
   const [planes, setPlanes] = useState<Plan[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [token, setToken] = useState<string | null>(null);
+  
 
   const [editDocumento, setEditDocumento] = useState('');
   const [editNombre, setEditNombre] = useState('');

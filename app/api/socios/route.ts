@@ -64,7 +64,7 @@ export async function GET(req: NextRequest) {
       // Si no hay documento, devolver todos los socios (sin recalcular activo)
       const socios = await Socio.find();
       return NextResponse.json(socios);
-    } catch (e) {
+    } catch {
       console.error(e);
       return NextResponse.json({ error: 'Error al obtener socios' }, { status: 500 });
     }

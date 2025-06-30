@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
   try {
     const gimnasios = await Gimnasio.find();
     return NextResponse.json(gimnasios);
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Error al obtener gimnasios' }, { status: 500 });
   }
 }
@@ -60,7 +60,7 @@ export async function POST(req: NextRequest) {
 
     const nuevoGimnasio = await Gimnasio.create(data);
     return NextResponse.json(nuevoGimnasio, { status: 201 });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Error al crear el gimnasio' }, { status: 500 });
   }
 }
@@ -97,7 +97,7 @@ export async function PUT(req: NextRequest) {
     }
 
     return NextResponse.json(gimnasio);
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Error al editar gimnasio' }, { status: 500 });
   }
 }
@@ -125,7 +125,7 @@ export async function DELETE(req: NextRequest) {
     }
 
     return NextResponse.json({ message: 'Gimnasio eliminado correctamente' });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Error al eliminar gimnasio' }, { status: 500 });
   }
 }

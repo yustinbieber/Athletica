@@ -13,7 +13,7 @@ interface MongooseCache {
 
 declare global {
   // Para que TypeScript reconozca la propiedad en global
-  // eslint-disable-next-line no-var
+   
   var mongoose: MongooseCache | undefined;
 }
 

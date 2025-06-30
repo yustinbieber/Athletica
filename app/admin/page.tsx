@@ -26,7 +26,7 @@ export default function AdminPage() {
       if (!res.ok) throw new Error('No se pudieron obtener estadísticas');
       const data = await res.json();
       setActivos(data.activos);
-    } catch (e) {
+    } catch {
       console.error(e);
     } finally {
       setLoading(false);

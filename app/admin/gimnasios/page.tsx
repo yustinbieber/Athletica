@@ -87,7 +87,7 @@ export default function GimnasiosPage() {
       }
       const data = await res.json();
       setGimnasios(data);
-    } catch (e) {
+    } catch {
       setError((e as Error).message);
     } finally {
       setLoading(false);
@@ -126,7 +126,7 @@ export default function GimnasiosPage() {
       if (!res.ok) throw new Error('Error al editar gimnasio');
       setEditId(null);
       await fetchGimnasios(token);
-    } catch (e) {
+    } catch {
       alert((e as Error).message);
     }
   }
@@ -141,7 +141,7 @@ export default function GimnasiosPage() {
       });
       if (!res.ok) throw new Error('Error al eliminar gimnasio');
       await fetchGimnasios(token);
-    } catch (e) {
+    } catch {
       alert((e as Error).message);
     }
   }
@@ -164,7 +164,7 @@ export default function GimnasiosPage() {
       });
       if (!res.ok) throw new Error('Error al cambiar estado del gimnasio');
       await fetchGimnasios(token);
-    } catch (e) {
+    } catch {
       alert((e as Error).message);
     }
   }

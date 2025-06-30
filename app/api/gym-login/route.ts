@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
     );
 
     return NextResponse.json({ token });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Error en el servidor' }, { status: 500 });
   }
 }

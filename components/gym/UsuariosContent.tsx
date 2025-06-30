@@ -99,7 +99,7 @@ const buttonBaseStyle = {
   minWidth: '120px',
   fontWeight: '600',
   fontSize: '1rem',
-  userSelect: 'none' as 'none', // <- aquí la corrección
+  userSelect: 'none' as const, // <- aquí la corrección
   transition: 'background-color 0.3s ease',
 };
 

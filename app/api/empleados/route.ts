@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
   try {
     const empleados = await Empleado.find({ gymId });
     return NextResponse.json(empleados);
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Error al obtener empleados' }, { status: 500 });
   }
 }
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
       gymId: data.gymId,
     });
     return NextResponse.json(nuevoEmpleado, { status: 201 });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Error al crear empleado' }, { status: 500 });
   }
 }
@@ -63,7 +63,7 @@ export async function PUT(req: NextRequest) {
     }
 
     return NextResponse.json(empleadoActualizado);
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Error al actualizar empleado' }, { status: 500 });
   }
 }
@@ -83,7 +83,7 @@ export async function DELETE(req: NextRequest) {
     }
 
     return NextResponse.json({ message: 'Empleado eliminado correctamente' });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Error al eliminar empleado' }, { status: 500 });
   }
 }

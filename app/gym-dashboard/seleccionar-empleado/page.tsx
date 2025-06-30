@@ -64,7 +64,7 @@ export default function SeleccionarEmpleadoPage() {
       // Filtrar solo empleados activos
       const activos = data.filter((e: Empleado) => e.activo);
       setEmpleados(activos);
-    } catch (e) {
+    } catch {
       setError((e as Error).message);
     } finally {
       setLoading(false);

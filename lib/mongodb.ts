@@ -6,11 +6,24 @@ if (!MONGODB_URI) {
   throw new Error('Por favor define la variable MONGODB_URI en .env.local');
 }
 
-let cached = (global as any).mongoose;
-
-if (!cached) {
-  cached = (global as any).mongoose = { conn: null, promise: null };
+interface MongooseCache {
+  conn: typeof mongoose | null;
+  promise: Promise<typeof mongoose> | null;
 }
+
+declare global {
+  // Para que TypeScript reconozca la propiedad en global
+  // eslint-disable-next-line no-var
+  var mongoose: MongooseCache | undefined;
+}
+
+let cached: MongooseCache;
+
+if (!global.mongoose) {
+  global.mongoose = { conn: null, promise: null };
+}
+
+cached = global.mongoose;
 
 async function dbConnect() {
   if (cached.conn) return cached.conn;

@@ -19,6 +19,13 @@ function verifyToken(req: NextRequest) {
   }
 }
 
+interface GimnasioUpdate {
+  username?: string;
+  gymName?: string;
+  password?: string;
+  activo?: boolean;
+}
+
 export async function GET(req: NextRequest) {
   const user = verifyToken(req);
   if (!user) {
@@ -74,7 +81,7 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: 'ID del gimnasio requerido' }, { status: 400 });
     }
 
-    const updateData: any = { username, gymName };
+    const updateData: GimnasioUpdate = { username, gymName };
 
     if (password) {
       const salt = await bcrypt.genSalt(10);

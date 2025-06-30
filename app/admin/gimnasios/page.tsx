@@ -10,6 +10,13 @@ interface Gimnasio {
   activo: boolean;
 }
 
+interface GimnasioUpdate {
+  _id: string;
+  username: string;
+  gymName: string;
+  password?: string;
+}
+
 const thStyle = {
   padding: '12px',
   backgroundColor: '#1E1E1E',
@@ -97,8 +104,7 @@ export default function GimnasiosPage() {
   async function handleEditSubmit() {
     if (!editId || !token) return;
 
-    // Armar body sin password si no se editó
-    const body: any = {
+    const body: GimnasioUpdate = {
       _id: editId,
       username: editUsername,
       gymName: editGymName,
@@ -197,7 +203,11 @@ export default function GimnasiosPage() {
 
       {/* Filtro y búsqueda */}
       <div style={{ marginBottom: 20, display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-        <select value={estadoFiltro} onChange={(e) => setEstadoFiltro(e.target.value as any)} style={inputStyle}>
+        <select
+          value={estadoFiltro}
+          onChange={(e) => setEstadoFiltro(e.target.value as 'todos' | 'activos' | 'inactivos')}
+          style={inputStyle}
+        >
           <option value="todos">Todos</option>
           <option value="activos">Activos</option>
           <option value="inactivos">Inactivos</option>

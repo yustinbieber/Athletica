@@ -2,6 +2,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import Movimiento from '@/models/Movimiento';
 
+interface MovimientoFiltro {
+  gymId: string;
+  tipo?: string;
+  socioId?: string;
+  fecha?: {
+    $gte?: Date;
+    $lte?: Date;
+  };
+}
+
 export async function GET(req: NextRequest) {
   await dbConnect();
   const { searchParams } = new URL(req.url);
@@ -15,13 +25,17 @@ export async function GET(req: NextRequest) {
   const fechaHasta = searchParams.get('fechaHasta');
 
   try {
-    const filtro: any = { gymId };
+    const filtro: MovimientoFiltro = { gymId };
+  
     if (tipo) filtro.tipo = tipo;
     if (socioId) filtro.socioId = socioId;
-    if (fechaDesde || fechaHasta) filtro.fecha = {};
-    if (fechaDesde) filtro.fecha.$gte = new Date(fechaDesde);
-    if (fechaHasta) filtro.fecha.$lte = new Date(fechaHasta);
-
+  
+    if (fechaDesde || fechaHasta) {
+      filtro.fecha = {};
+      if (fechaDesde) filtro.fecha.$gte = new Date(fechaDesde);
+      if (fechaHasta) filtro.fecha.$lte = new Date(fechaHasta);
+    }
+  
     const movimientos = await Movimiento.find(filtro).sort({ fecha: -1 });
     return NextResponse.json(movimientos);
   } catch {

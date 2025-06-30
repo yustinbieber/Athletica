@@ -5,13 +5,17 @@ import Empleado from '@/models/Empleado';
 export async function GET(req: NextRequest) {
   await dbConnect();
   const { searchParams } = new URL(req.url);
-  
-  if (!gymId) return NextResponse.json({ error: 'gymId requerido' }, { status: 400 });
+  const gymId = searchParams.get('gymId');
+
+  if (!gymId) {
+    return NextResponse.json({ error: 'gymId requerido' }, { status: 400 });
+  }
 
   try {
     const empleados = await Empleado.find({ gymId });
     return NextResponse.json(empleados);
-  } catch {
+  } catch (error) {
+    console.error('Error al obtener empleados:', error);
     return NextResponse.json({ error: 'Error al obtener empleados' }, { status: 500 });
   }
 }
@@ -33,7 +37,8 @@ export async function POST(req: NextRequest) {
       gymId: data.gymId,
     });
     return NextResponse.json(nuevoEmpleado, { status: 201 });
-  } catch {
+  } catch (error) {
+    console.error('Error al crear empleado:', error);
     return NextResponse.json({ error: 'Error al crear empleado' }, { status: 500 });
   }
 }
@@ -63,7 +68,8 @@ export async function PUT(req: NextRequest) {
     }
 
     return NextResponse.json(empleadoActualizado);
-  } catch {
+  } catch (error) {
+    console.error('Error al actualizar empleado:', error);
     return NextResponse.json({ error: 'Error al actualizar empleado' }, { status: 500 });
   }
 }
@@ -83,7 +89,8 @@ export async function DELETE(req: NextRequest) {
     }
 
     return NextResponse.json({ message: 'Empleado eliminado correctamente' });
-  } catch {
+  } catch (error) {
+    console.error('Error al eliminar empleado:', error);
     return NextResponse.json({ error: 'Error al eliminar empleado' }, { status: 500 });
   }
 }

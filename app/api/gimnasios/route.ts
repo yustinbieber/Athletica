@@ -14,7 +14,8 @@ function verifyToken(req: NextRequest) {
     if (!token) return null;
     const decoded = jwt.verify(token, SECRET);
     return decoded;
-  } catch {
+  } catch (error) {
+    console.error('Token verification error:', error);
     return null;
   }
 }
@@ -37,7 +38,8 @@ export async function GET(req: NextRequest) {
   try {
     const gimnasios = await Gimnasio.find();
     return NextResponse.json(gimnasios);
-  } catch {
+  } catch (error) {
+    console.error('Error al obtener gimnasios:', error);
     return NextResponse.json({ error: 'Error al obtener gimnasios' }, { status: 500 });
   }
 }
@@ -49,9 +51,8 @@ export async function POST(req: NextRequest) {
   }
 
   await dbConnect();
-  const data = await req.json();
-
   try {
+    const data = await req.json();
     if (!data.password) {
       return NextResponse.json({ error: 'Contraseña requerida' }, { status: 400 });
     }
@@ -60,7 +61,8 @@ export async function POST(req: NextRequest) {
 
     const nuevoGimnasio = await Gimnasio.create(data);
     return NextResponse.json(nuevoGimnasio, { status: 201 });
-  } catch {
+  } catch (error) {
+    console.error('Error al crear el gimnasio:', error);
     return NextResponse.json({ error: 'Error al crear el gimnasio' }, { status: 500 });
   }
 }
@@ -97,7 +99,8 @@ export async function PUT(req: NextRequest) {
     }
 
     return NextResponse.json(gimnasio);
-  } catch {
+  } catch (error) {
+    console.error('Error al editar gimnasio:', error);
     return NextResponse.json({ error: 'Error al editar gimnasio' }, { status: 500 });
   }
 }
@@ -125,7 +128,8 @@ export async function DELETE(req: NextRequest) {
     }
 
     return NextResponse.json({ message: 'Gimnasio eliminado correctamente' });
-  } catch {
+  } catch (error) {
+    console.error('Error al eliminar gimnasio:', error);
     return NextResponse.json({ error: 'Error al eliminar gimnasio' }, { status: 500 });
   }
 }

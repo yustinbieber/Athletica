@@ -14,7 +14,7 @@ export default function AdminPage() {
     } else {
       fetchEstadisticas(t);
     }
-  }, [router]);
+  }, [router]); // <-- Agregado router
 
   async function fetchEstadisticas(token: string) {
     try {

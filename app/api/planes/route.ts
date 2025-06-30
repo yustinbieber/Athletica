@@ -13,7 +13,8 @@ function verifyToken(req: NextRequest) {
     if (!token) return null;
     const decoded = jwt.verify(token, SECRET);
     return decoded;
-  } catch {
+  } catch (error) {
+    console.error('Token verification failed:', error);
     return null;
   }
 }
@@ -27,7 +28,8 @@ export async function GET(req: NextRequest) {
   try {
     const planes = await Plan.find();
     return NextResponse.json(planes);
-  } catch {
+  } catch (error) {
+    console.error('Error fetching plans:', error);
     return NextResponse.json({ error: 'Error al obtener planes' }, { status: 500 });
   }
 }
@@ -39,7 +41,7 @@ export async function POST(req: NextRequest) {
   await dbConnect();
   const data = await req.json();
 
-  if (!data.nombre || !data.precio || !data.duracionDias) {
+  if (!data.nombre || data.precio == null || data.duracionDias == null) {
     return NextResponse.json({ error: 'Faltan datos obligatorios' }, { status: 400 });
   }
 
@@ -51,7 +53,8 @@ export async function POST(req: NextRequest) {
       duracionDias: data.duracionDias,
     });
     return NextResponse.json(nuevoPlan, { status: 201 });
-  } catch {
+  } catch (error) {
+    console.error('Error creating plan:', error);
     return NextResponse.json({ error: 'Error al crear plan' }, { status: 500 });
   }
 }
@@ -63,7 +66,7 @@ export async function PUT(req: NextRequest) {
   await dbConnect();
   const data = await req.json();
 
-  if (!data._id || !data.nombre || !data.precio || !data.duracionDias) {
+  if (!data._id || !data.nombre || data.precio == null || data.duracionDias == null) {
     return NextResponse.json({ error: 'Faltan datos obligatorios' }, { status: 400 });
   }
 
@@ -82,7 +85,8 @@ export async function PUT(req: NextRequest) {
     if (!plan) return NextResponse.json({ error: 'Plan no encontrado' }, { status: 404 });
 
     return NextResponse.json(plan);
-  } catch {
+  } catch (error) {
+    console.error('Error updating plan:', error);
     return NextResponse.json({ error: 'Error al actualizar plan' }, { status: 500 });
   }
 }
@@ -102,7 +106,8 @@ export async function DELETE(req: NextRequest) {
     if (!plan) return NextResponse.json({ error: 'Plan no encontrado' }, { status: 404 });
 
     return NextResponse.json({ message: 'Plan eliminado correctamente' });
-  } catch {
+  } catch (error) {
+    console.error('Error deleting plan:', error);
     return NextResponse.json({ error: 'Error al eliminar plan' }, { status: 500 });
   }
 }

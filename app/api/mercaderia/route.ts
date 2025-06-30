@@ -7,7 +7,8 @@ export async function GET() {
   try {
     const mercaderias = await Mercaderia.find();
     return NextResponse.json(mercaderias);
-  } catch {
+  } catch (error) {
+    console.error('Error al obtener mercadería:', error);
     return NextResponse.json({ error: 'Error al obtener mercadería' }, { status: 500 });
   }
 }
@@ -26,7 +27,8 @@ export async function POST(req: NextRequest) {
       precioUnitario: data.precioUnitario,
     });
     return NextResponse.json(nuevaMercaderia, { status: 201 });
-  } catch {
+  } catch (error) {
+    console.error('Error al crear mercadería:', error);
     return NextResponse.json({ error: 'Error al crear mercadería' }, { status: 500 });
   }
 }
@@ -38,14 +40,16 @@ export async function PUT(req: NextRequest) {
     if (!data._id) {
       return NextResponse.json({ error: 'ID requerido para actualizar' }, { status: 400 });
     }
+
+    const updateFields: Partial<typeof data> = {};
+    if (data.nombre !== undefined) updateFields.nombre = data.nombre;
+    if (data.descripcion !== undefined) updateFields.descripcion = data.descripcion;
+    if (data.stock !== undefined) updateFields.stock = data.stock;
+    if (data.precioUnitario !== undefined) updateFields.precioUnitario = data.precioUnitario;
+
     const mercaderiaActualizada = await Mercaderia.findByIdAndUpdate(
       data._id,
-      {
-        nombre: data.nombre,
-        descripcion: data.descripcion || '',
-        stock: data.stock ?? 0,
-        precioUnitario: data.precioUnitario,
-      },
+      updateFields,
       { new: true }
     );
 
@@ -54,7 +58,8 @@ export async function PUT(req: NextRequest) {
     }
 
     return NextResponse.json(mercaderiaActualizada);
-  } catch {
+  } catch (error) {
+    console.error('Error al actualizar mercadería:', error);
     return NextResponse.json({ error: 'Error al actualizar mercadería' }, { status: 500 });
   }
 }
@@ -74,7 +79,8 @@ export async function DELETE(req: NextRequest) {
     }
 
     return NextResponse.json({ message: 'Mercadería eliminada correctamente' });
-  } catch {
+  } catch (error) {
+    console.error('Error al eliminar mercadería:', error);
     return NextResponse.json({ error: 'Error al eliminar mercadería' }, { status: 500 });
   }
 }

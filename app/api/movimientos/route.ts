@@ -26,19 +26,26 @@ export async function GET(req: NextRequest) {
 
   try {
     const filtro: MovimientoFiltro = { gymId };
-  
+
     if (tipo) filtro.tipo = tipo;
     if (socioId) filtro.socioId = socioId;
-  
+
     if (fechaDesde || fechaHasta) {
       filtro.fecha = {};
-      if (fechaDesde) filtro.fecha.$gte = new Date(fechaDesde);
-      if (fechaHasta) filtro.fecha.$lte = new Date(fechaHasta);
+      if (fechaDesde) {
+        const fechaGte = new Date(fechaDesde);
+        if (!isNaN(fechaGte.getTime())) filtro.fecha.$gte = fechaGte;
+      }
+      if (fechaHasta) {
+        const fechaLte = new Date(fechaHasta);
+        if (!isNaN(fechaLte.getTime())) filtro.fecha.$lte = fechaLte;
+      }
     }
-  
+
     const movimientos = await Movimiento.find(filtro).sort({ fecha: -1 });
     return NextResponse.json(movimientos);
-  } catch {
+  } catch (error) {
+    console.error('Error al obtener movimientos:', error);
     return NextResponse.json({ error: 'Error al obtener movimientos' }, { status: 500 });
   }
 }
@@ -64,9 +71,8 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json(nuevoMovimiento, { status: 201 });
-  } catch {
+  } catch (error) {
+    console.error('Error al crear movimiento:', error);
     return NextResponse.json({ error: 'Error al crear movimiento' }, { status: 500 });
   }
 }
-
-// PUT y DELETE si querés después, arrancamos con GET y POST

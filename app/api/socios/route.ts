@@ -19,57 +19,63 @@ function verifyToken(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
-    const user = verifyToken(req);
-    if (!user) return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
-  
-    await dbConnect();
-  
-    try {
-      const { searchParams } = new URL(req.url);
-      const documento = searchParams.get('documento');
-  
-      if (documento) {
-        // Buscar solo ese socio
-        const socio = await Socio.findOne({ documento });
-        if (!socio) return NextResponse.json(null);
-  
-        const plan = await Plan.findById(socio.planId);
-        const duracionDias = plan?.duracionDias || 30;
-  
-        // Calcular fecha de vencimiento
-        const fechaAlta = new Date(socio.fechaAlta);
-        const fechaVencimiento = new Date(fechaAlta.getTime() + duracionDias * 24 * 60 * 60 * 1000);
-        const hoy = new Date();
-  
-        // Calcular si está activo (fecha actual <= fecha vencimiento)
-        const activoCalculado = hoy <= fechaVencimiento;
-  
-        // Si el estado activo guardado difiere del calculado, actualizarlo en BD
-        if (socio.activo !== activoCalculado) {
-          socio.activo = activoCalculado;
-          await socio.save();
-        }
-  
-        return NextResponse.json({
-          documento: socio.documento,
-          nombreCompleto: socio.nombreCompleto,
-          planNombre: plan?.nombre || 'N/A',
-          planDuracionDias: duracionDias,
-          fechaAlta: socio.fechaAlta,
-          activo: socio.activo,
-          fotoUrl: socio.fotoUrl || null,
-        });
+  const user = verifyToken(req);
+  if (!user) return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+
+  await dbConnect();
+
+  try {
+    const { searchParams } = new URL(req.url);
+    const documento = searchParams.get('documento');
+
+    if (documento) {
+      // Buscar solo ese socio
+      const socio = await Socio.findOne({ documento });
+      if (!socio) return NextResponse.json(null);
+
+      const plan = await Plan.findById(socio.planId);
+      const duracionDias = plan?.duracionDias || 30;
+
+      // Calcular fecha de vencimiento
+      const fechaAlta = new Date(socio.fechaAlta);
+      const fechaVencimiento = new Date(fechaAlta.getTime() + duracionDias * 24 * 60 * 60 * 1000);
+      const hoy = new Date();
+
+      // Calcular si está activo (fecha actual <= fecha vencimiento)
+      const activoCalculado = hoy <= fechaVencimiento;
+
+      // Si el estado activo guardado difiere del calculado, actualizarlo en BD
+      if (socio.activo !== activoCalculado) {
+        socio.activo = activoCalculado;
+        await socio.save();
       }
-  
-      // Si no hay documento, devolver todos los socios (sin recalcular activo)
-      const socios = await Socio.find();
-      return NextResponse.json(socios);
-    } catch {
-      console.error(e);
-      return NextResponse.json({ error: 'Error al obtener socios' }, { status: 500 });
+
+      return NextResponse.json({
+        _id: socio._id,
+        documento: socio.documento,
+        nombreCompleto: socio.nombreCompleto,
+        planNombre: plan?.nombre || 'N/A',
+        planDuracionDias: duracionDias,
+        fechaAlta: socio.fechaAlta,
+        activo: socio.activo,
+        fotoUrl: socio.fotoUrl || null,
+        telefono: socio.telefono,
+        email: socio.email,
+        direccion: socio.direccion,
+        contactoEmergencia: socio.contactoEmergencia,
+        planId: socio.planId,
+        fechaNacimiento: socio.fechaNacimiento,
+      });
     }
+
+    // Si no hay documento, devolver todos los socios (sin recalcular activo)
+    const socios = await Socio.find();
+    return NextResponse.json(socios);
+  } catch (e) {
+    console.error(e);
+    return NextResponse.json({ error: 'Error al obtener socios' }, { status: 500 });
   }
-  
+}
 
 export async function POST(req: NextRequest) {
   const user = verifyToken(req);
@@ -107,7 +113,8 @@ export async function POST(req: NextRequest) {
       fechaAlta: new Date(data.fechaAlta),
     });
     return NextResponse.json(nuevoSocio, { status: 201 });
-  } catch {
+  } catch (e) {
+    console.error(e);
     return NextResponse.json({ error: 'Error al crear socio' }, { status: 500 });
   }
 }
@@ -118,9 +125,14 @@ export async function PUT(req: NextRequest) {
 
   await dbConnect();
   const data = await req.json();
+  const { searchParams } = new URL(req.url);
+  const documentoQuery = searchParams.get('documento');
+
+  // Documento para buscar y actualizar:
+  const documentoParaActualizar = documentoQuery || data.documento;
 
   if (
-    !data.documento ||
+    !documentoParaActualizar ||
     !data.nombreCompleto ||
     !data.fechaNacimiento ||
     !data.telefono ||
@@ -133,7 +145,7 @@ export async function PUT(req: NextRequest) {
 
   try {
     const socio = await Socio.findOneAndUpdate(
-      { documento: data.documento },
+      { documento: documentoParaActualizar },
       {
         nombreCompleto: data.nombreCompleto,
         fechaNacimiento: new Date(data.fechaNacimiento),
@@ -149,7 +161,8 @@ export async function PUT(req: NextRequest) {
     );
     if (!socio) return NextResponse.json({ error: 'Socio no encontrado' }, { status: 404 });
     return NextResponse.json(socio);
-  } catch {
+  } catch (e) {
+    console.error(e);
     return NextResponse.json({ error: 'Error al actualizar socio' }, { status: 500 });
   }
 }
@@ -168,7 +181,8 @@ export async function DELETE(req: NextRequest) {
     const socio = await Socio.findOneAndDelete({ documento });
     if (!socio) return NextResponse.json({ error: 'Socio no encontrado' }, { status: 404 });
     return NextResponse.json({ message: 'Socio eliminado correctamente' });
-  } catch {
+  } catch (e) {
+    console.error(e);
     return NextResponse.json({ error: 'Error al eliminar socio' }, { status: 500 });
   }
 }

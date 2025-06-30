@@ -12,19 +12,28 @@ function verifyToken(req: Request) {
     if (!authHeader) return null;
     const token = authHeader.split(' ')[1];
     return jwt.verify(token, SECRET);
-  } catch {
+  } catch (error) {
+    // Log para debugging (opcional)
+    console.error('Error verificando token:', error);
     return null;
   }
 }
 
 export async function GET(req: Request) {
   const user = verifyToken(req);
-  if (!user) return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+  if (!user) {
+    return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+  }
 
-  await dbConnect();
+  try {
+    await dbConnect();
 
-  const totalGimnasios = await Gimnasio.countDocuments();
-  const activos = await Gimnasio.countDocuments({ activo: true });
+    const totalGimnasios = await Gimnasio.countDocuments();
+    const activos = await Gimnasio.countDocuments({ activo: true });
 
-  return NextResponse.json({ totalGimnasios, activos });
+    return NextResponse.json({ totalGimnasios, activos });
+  } catch (error) {
+    console.error('Error en GET /api/dashboard:', error);
+    return NextResponse.json({ error: 'Error interno del servidor' }, { status: 500 });
+  }
 }

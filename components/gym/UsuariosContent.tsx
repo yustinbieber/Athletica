@@ -8,8 +8,8 @@ interface Socio {
   nombreCompleto: string;
   fechaNacimiento: string;
   telefono: string;
-  email?: string;
-  direccion?: string;
+  email: string; // 👈 ya no opcional
+  direccion: string; // 👈 ya no opcional
   contactoEmergencia: string;
   planId: string;
   activo: boolean;

@@ -5,13 +5,21 @@ import jwt from 'jsonwebtoken';
 
 const SECRET = process.env.JWT_SECRET as string;
 
-function verifyToken(req: NextRequest) {
+// Tipamos correctamente el contenido del token JWT
+interface UserToken {
+  id: string;
+  gymId?: string;
+  rol: string;
+}
+
+// Verifica el token y lo tipa correctamente
+function verifyToken(req: NextRequest): UserToken | null {
   try {
     const authHeader = req.headers.get('authorization');
     if (!authHeader) return null;
     const token = authHeader.split(' ')[1];
     if (!token) return null;
-    const decoded = jwt.verify(token, SECRET);
+    const decoded = jwt.verify(token, SECRET) as UserToken;
     return decoded;
   } catch (e: unknown) {
     const error = e as Error;
@@ -20,6 +28,7 @@ function verifyToken(req: NextRequest) {
   }
 }
 
+// Obtener planes
 export async function GET(req: NextRequest) {
   const user = verifyToken(req);
   if (!user) return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
@@ -27,7 +36,7 @@ export async function GET(req: NextRequest) {
   await dbConnect();
 
   try {
-    const planes = await Plan.find();
+    const planes = await Plan.find({ gymId: user.gymId || user.id });
     return NextResponse.json(planes);
   } catch (e: unknown) {
     const error = e as Error;
@@ -36,6 +45,7 @@ export async function GET(req: NextRequest) {
   }
 }
 
+// Crear plan
 export async function POST(req: NextRequest) {
   const user = verifyToken(req);
   if (!user) return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
@@ -47,7 +57,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Faltan datos obligatorios' }, { status: 400 });
   }
 
-  const gymId = user.gymId || user.id; // 👈 Detecta si viene como empleado o admin
+  const gymId = user.gymId || user.id;
 
   try {
     const nuevoPlan = await Plan.create({
@@ -55,7 +65,7 @@ export async function POST(req: NextRequest) {
       descripcion: data.descripcion || '',
       precio: data.precio,
       duracionDias: data.duracionDias,
-      gymId, // 👈 Se incluye correctamente
+      gymId,
     });
 
     return NextResponse.json(nuevoPlan, { status: 201 });
@@ -66,7 +76,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-
+// Editar plan
 export async function PUT(req: NextRequest) {
   const user = verifyToken(req);
   if (!user) return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
@@ -79,8 +89,8 @@ export async function PUT(req: NextRequest) {
   }
 
   try {
-    const plan = await Plan.findByIdAndUpdate(
-      data._id,
+    const plan = await Plan.findOneAndUpdate(
+      { _id: data._id, gymId: user.gymId || user.id },
       {
         nombre: data.nombre,
         descripcion: data.descripcion || '',
@@ -100,6 +110,7 @@ export async function PUT(req: NextRequest) {
   }
 }
 
+// Eliminar plan
 export async function DELETE(req: NextRequest) {
   const user = verifyToken(req);
   if (!user) return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
@@ -111,7 +122,7 @@ export async function DELETE(req: NextRequest) {
   if (!id) return NextResponse.json({ error: 'ID del plan requerido' }, { status: 400 });
 
   try {
-    const plan = await Plan.findByIdAndDelete(id);
+    const plan = await Plan.findOneAndDelete({ _id: id, gymId: user.gymId || user.id });
     if (!plan) return NextResponse.json({ error: 'Plan no encontrado' }, { status: 404 });
 
     return NextResponse.json({ message: 'Plan eliminado correctamente' });

@@ -19,8 +19,6 @@ interface Props {
 }
 
 export default function ControlPlataContent({ gymId, empleadoId }: Props) {
-  console.log('gymId:', gymId);
-  console.log('empleadoId:', empleadoId);
 
   const [movimientos, setMovimientos] = useState<Movimiento[]>([]);
   const [loading, setLoading] = useState(false);
@@ -78,8 +76,6 @@ export default function ControlPlataContent({ gymId, empleadoId }: Props) {
       empleadoId: empleadoId.trim(),
       gymId: gymId.trim(),
     };
-
-    console.log('Enviando movimiento:', bodyData);
 
     try {
       const res = await fetch('/api/movimientos', {

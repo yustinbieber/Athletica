@@ -26,6 +26,7 @@ interface GimnasioUpdate {
   gymName?: string;
   password?: string;
   activo?: boolean;
+  rol?: string;
 }
 
 export async function GET(req: NextRequest) {
@@ -55,13 +56,21 @@ export async function POST(req: NextRequest) {
   await dbConnect();
   try {
     const data = await req.json();
-    if (!data.password) {
-      return NextResponse.json({ error: 'Contraseña requerida' }, { status: 400 });
+
+    if (!data.password || !data.username || !data.gymName) {
+      return NextResponse.json({ error: 'Faltan datos requeridos' }, { status: 400 });
     }
+
     const salt = await bcrypt.genSalt(10);
     data.password = await bcrypt.hash(data.password, salt);
 
-    const nuevoGimnasio = await Gimnasio.create(data);
+    // 👇 Agregar campo de rol por defecto
+    const nuevoGimnasio = await Gimnasio.create({
+      ...data,
+      rol: 'admin',
+      activo: true,
+    });
+
     return NextResponse.json(nuevoGimnasio, { status: 201 });
   } catch (e: unknown) {
     const error = e as Error;

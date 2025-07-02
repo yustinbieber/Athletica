@@ -47,13 +47,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Faltan datos obligatorios' }, { status: 400 });
   }
 
+  const gymId = user.gymId || user.id; // 👈 Detecta si viene como empleado o admin
+
   try {
     const nuevoPlan = await Plan.create({
       nombre: data.nombre,
       descripcion: data.descripcion || '',
       precio: data.precio,
       duracionDias: data.duracionDias,
+      gymId, // 👈 Se incluye correctamente
     });
+
     return NextResponse.json(nuevoPlan, { status: 201 });
   } catch (e: unknown) {
     const error = e as Error;
@@ -61,6 +65,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Error al crear plan' }, { status: 500 });
   }
 }
+
 
 export async function PUT(req: NextRequest) {
   const user = verifyToken(req);

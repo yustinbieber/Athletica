@@ -44,6 +44,7 @@ export default function EmpleadosContent({ gymId }: Props) {
   const [nuevoEmail, setNuevoEmail] = useState('');
   const [nuevoTelefono, setNuevoTelefono] = useState('');
   const [nuevoPuesto, setNuevoPuesto] = useState('');
+  const [nuevoPassword, setNuevoPassword] = useState('');
 
   // Edición
   const [editId, setEditId] = useState<string | null>(null);
@@ -98,6 +99,7 @@ export default function EmpleadosContent({ gymId }: Props) {
           email: nuevoEmail,
           telefono: nuevoTelefono,
           puesto: nuevoPuesto,
+          password: nuevoPassword,
           gymId,
         }),
       });
@@ -140,6 +142,7 @@ export default function EmpleadosContent({ gymId }: Props) {
           telefono: editTelefono,
           puesto: editPuesto,
           activo: editActivo,
+          password: nuevoPassword,
         }),
       });
       if (!res.ok) throw new Error('Error al actualizar empleado');
@@ -190,6 +193,14 @@ export default function EmpleadosContent({ gymId }: Props) {
           value={nuevoEmail}
           onChange={(e) => setNuevoEmail(e.target.value)}
           style={{ ...inputStyle, flex: '1 1 200px' }}
+        />
+        <input
+          type="password"
+          placeholder="Contraseña *"
+          value={nuevoPassword}
+          onChange={(e) => setNuevoPassword(e.target.value)}
+          style={{ ...inputStyle, flex: '1 1 150px' }}
+          required
         />
         <input
           type="text"

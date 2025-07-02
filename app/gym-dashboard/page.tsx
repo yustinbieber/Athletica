@@ -1,6 +1,6 @@
 'use client';
 
-import { SetStateAction, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Sidebar from '@/components/gym/Sidebar';
 
@@ -10,22 +10,24 @@ import UsuariosContent from '@/components/gym/UsuariosContent';
 import ControlIngresosContent from '@/components/gym/ControlIngresosContent';
 import MercaderiaPage from '@/components/gym/Mercaderia';
 import EmpleadosContent from '@/components/gym/EmpleadosContent';
-import ControlPlataContent from '@/components/gym/ControlPlataContent'; // <--- Importar nuevo componente
-
+import ControlPlataContent from '@/components/gym/ControlPlataContent';
+import PorVencerContent from '@/components/gym/PorVencerContent';
 
 interface GymTokenPayload {
   id: string;
-  username: string;
+  username?: string;
   gymName: string;
+  gymId?: string;
   empleadoId?: string;
+  rol: 'admin' | 'empleado';
   exp: number;
   iat: number;
+  nombreCompleto?: string;
 }
 
 interface Empleado {
-  _id: string;
+  _id?: string;
   nombreCompleto: string;
-  // otros campos si los usas
 }
 
 export default function GymDashboard() {
@@ -33,45 +35,45 @@ export default function GymDashboard() {
   const [userData, setUserData] = useState<GymTokenPayload | null>(null);
   const [empleadoActivo, setEmpleadoActivo] = useState<Empleado | null>(null);
   const [section, setSection] = useState('dashboard');
+  const [rol, setRol] = useState<'dueño' | 'empleado'>();
+  const [sidebarExpanded, setSidebarExpanded] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem('gymToken');
     if (!token) {
-      router.push('/gym-dashboard/gym-login');
+      router.push('/gym-login');
       return;
     }
 
     try {
       const payloadBase64 = token.split('.')[1];
       const decodedJson = atob(payloadBase64);
-      const decoded = JSON.parse(decodedJson);
+      const decoded: GymTokenPayload = JSON.parse(decodedJson);
 
       if (decoded.exp * 1000 < Date.now()) {
         localStorage.removeItem('gymToken');
-        router.push('/gym-dashboard/gym-login');
+        router.push('/gym-login');
         return;
       }
 
       setUserData(decoded);
+      setRol(decoded.rol === 'admin' ? 'dueño' : 'empleado');
 
-      // Intentamos cargar empleado activo desde localStorage
-      const empleadoStr = localStorage.getItem('empleadoActivo');
-      if (empleadoStr) {
-        setEmpleadoActivo(JSON.parse(empleadoStr));
-      }
+      const nombre = localStorage.getItem('empleadoNombre');
+      if (nombre) setEmpleadoActivo({ nombreCompleto: nombre });
     } catch {
       localStorage.removeItem('gymToken');
-      router.push('/gym-dashboard/gym-login');
+      router.push('/gym-login');
     }
   }, [router]);
 
   function handleLogout() {
     localStorage.removeItem('gymToken');
-    localStorage.removeItem('empleadoActivo'); // borrar empleado activo al cerrar sesión
-    router.push('/gym-dashboard/gym-login');
+    localStorage.removeItem('empleadoNombre');
+    router.push('/gym-login');
   }
 
-  if (!userData) return <p>Cargando...</p>;
+  if (!userData || !rol) return <p>Cargando...</p>;
 
   let content;
   switch (section) {
@@ -85,38 +87,57 @@ export default function GymDashboard() {
       content = <UsuariosContent />;
       break;
     case 'ingresos':
-      // Pasale el empleadoActivo._id para controlar dinero, etc.
       content = <ControlIngresosContent />;
+      break;
+      case 'porVencer':
+      content = <PorVencerContent />;
       break;
     case 'mercaderia':
       content = <MercaderiaPage />;
       break;
-      case 'empleados':
-        content = <EmpleadosContent gymId={userData.id} />;
-        break;
-      case 'Movimientos':
-        content = (
-          <ControlPlataContent
-            gymId={userData.id}
-            empleadoId={userData.empleadoId || ''} // <-- pasar empleadoId aquí
-          />
-        );
-        break;
-      default:
-        content = <DashboardContent gymName={userData.gymName} />;
-    }
+    case 'empleados':
+      content = (
+        <EmpleadosContent
+          gymId={userData.rol === 'admin' ? userData.id : userData.gymId!}
+        />
+      );
+      break;
+    case 'Movimientos':
+      content = (
+        <ControlPlataContent
+          gymId={userData.rol === 'admin' ? userData.id : userData.gymId!}
+          empleadoId={userData.empleadoId || ''}
+        />
+      );
+      break;
+    default:
+      content = <DashboardContent gymName={userData.gymName} />;
+  }
 
   return (
-    <div style={{ display: 'flex' }}>
+    <div style={{ display: 'flex', height: '100vh' }}>
       <Sidebar
         currentSection={section}
         setSection={setSection}
         onLogout={handleLogout}
-        gymName={userData.gymName}
-        empleadoNombre={empleadoActivo?.nombreCompleto} // PASAMOS NOMBRE EMPLEADO AL SIDEBAR
+        gymName={userData.gymName || ''}
+        empleadoNombre={empleadoActivo?.nombreCompleto}
+        role={rol}
+        expanded={sidebarExpanded}
+        setExpanded={setSidebarExpanded}
       />
-      <main style={{ marginLeft: '22px', padding: '30px 20px', width: '100%' }}>
-        {content}
+
+      <main
+        style={{
+          flexGrow: 1,
+          padding: '20px',
+          transition: 'margin-left 0.3s ease',
+          marginLeft: sidebarExpanded ? '220px' : '80px',
+          display: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <div style={{ width: '100%', maxWidth: '1200px' }}>{content}</div>
       </main>
     </div>
   );

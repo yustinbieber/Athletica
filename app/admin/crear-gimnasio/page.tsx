@@ -21,7 +21,7 @@ export default function CrearUsuario() {
     const res = await fetch('/api/gimnasios', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ username, password, gymName }),
+      body: JSON.stringify({ username, password, gymName, rol: 'admin' }),
     });
 
     if (res.ok) {

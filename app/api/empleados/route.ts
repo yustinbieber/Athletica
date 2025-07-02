@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import Empleado from '@/models/Empleado';
+import bcrypt from 'bcryptjs';
 
 export async function GET(req: NextRequest) {
   await dbConnect();
@@ -25,22 +26,29 @@ export async function POST(req: NextRequest) {
   await dbConnect();
   try {
     const data = await req.json();
-    if (!data.nombreCompleto || !data.gymId) {
+
+    const { nombreCompleto, gymId, password } = data;
+
+    if (!nombreCompleto || !gymId || !password) {
       return NextResponse.json({ error: 'Faltan datos obligatorios' }, { status: 400 });
     }
 
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     const nuevoEmpleado = await Empleado.create({
-      nombreCompleto: data.nombreCompleto,
+      nombreCompleto,
       email: data.email || '',
       telefono: data.telefono || '',
       puesto: data.puesto || '',
+      password: hashedPassword, // Guardar contraseña encriptada
       activo: true,
-      gymId: data.gymId,
+      gymId,
+      empleadoId: crypto.randomUUID(),
     });
+
     return NextResponse.json(nuevoEmpleado, { status: 201 });
   } catch (e: unknown) {
-    const error = e as Error;
-    console.error('Error al crear empleado:', error.message);
+    console.error('Error al crear empleado:', (e as Error).message);
     return NextResponse.json({ error: 'Error al crear empleado' }, { status: 500 });
   }
 }

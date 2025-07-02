@@ -400,111 +400,120 @@ export default function GestionUsuarios() {
       <div style={{ maxWidth: 1300, margin: '0 auto' }}>
         <h1 style={{ color: '#FFD700', marginBottom: 20 }}>Gestión de Socios</h1>
 
-        {/* FORMULARIO AGREGAR SOCIO */}
         <form
-          onSubmit={agregarSocio}
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-            gap: 12,
-            marginBottom: 30,
-            backgroundColor: '#1E1E1E',
-            padding: 20,
-            borderRadius: 8,
-          }}
-        >
-          <input
-            name="documento"
-            placeholder="Documento"
-            value={form.documento}
-            onChange={handleInputChange}
-            style={{ padding: 8, borderRadius: 4, border: 'none' }}
-            required
-          />
-          <input
-            name="nombreCompleto"
-            placeholder="Nombre Completo"
-            value={form.nombreCompleto}
-            onChange={handleInputChange}
-            style={{ padding: 8, borderRadius: 4, border: 'none' }}
-            required
-          />
-          <input
-            name="fechaNacimiento"
-            type="date"
-            placeholder="Fecha de nacimiento"
-            value={form.fechaNacimiento}
-            onChange={handleInputChange}
-            style={{ padding: 8, borderRadius: 4, border: 'none' }}
-            required
-          />
-          <input
-            name="telefono"
-            placeholder="Teléfono"
-            value={form.telefono}
-            onChange={handleInputChange}
-            style={{ padding: 8, borderRadius: 4, border: 'none' }}
-            required
-          />
-          <input
-            name="email"
-            placeholder="Email"
-            value={form.email}
-            onChange={handleInputChange}
-            style={{ padding: 8, borderRadius: 4, border: 'none' }}
-          />
-          <input
-            name="direccion"
-            placeholder="Dirección"
-            value={form.direccion}
-            onChange={handleInputChange}
-            style={{ padding: 8, borderRadius: 4, border: 'none' }}
-          />
-          <input
-            name="contactoEmergencia"
-            placeholder="Contacto emergencia"
-            value={form.contactoEmergencia}
-            onChange={handleInputChange}
-            style={{ padding: 8, borderRadius: 4, border: 'none' }}
-            required
-          />
-          <select
-            name="planId"
-            value={form.planId}
-            onChange={handleInputChange}
-            style={{ padding: 8, borderRadius: 4, border: 'none' }}
-            required
-          >
-            <option value="">-- Seleccione plan --</option>
-            {planes.map((plan) => (
-              <option key={plan._id} value={plan._id}>
-                {plan.nombre}
-              </option>
-            ))}
-          </select>
-          <input
-            name="fechaAlta"
-            type="date"
-            placeholder="Fecha de alta"
-            value={form.fechaAlta}
-            onChange={handleInputChange}
-            style={{ padding: 8, borderRadius: 4, border: 'none' }}
-          />
-          <button
-            type="submit"
-            style={{
-              backgroundColor: '#FFA500',
-              color: '#000',
-              border: 'none',
-              borderRadius: 4,
-              cursor: 'pointer',
-              gridColumn: 'span 1',
-              fontWeight: 'bold',
-            }}
-          >
-            Agregar Socio
-          </button>
-        </form>
+  onSubmit={agregarSocio}
+  style={{
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+    gap: 16,
+    marginBottom: 30,
+    backgroundColor: '#1E1E1E',
+    padding: 24,
+    borderRadius: 12,
+    boxShadow: '0 0 10px rgba(255, 215, 0, 0.1)',
+  }}
+>
+{[
+  { name: 'documento', placeholder: 'Documento', required: true },
+  { name: 'nombreCompleto', placeholder: 'Nombre Completo', required: true },
+  // Aquí ponemos label para la fechaNacimiento
+  { name: 'fechaNacimiento', placeholder: 'Fecha de Nacimiento', type: 'date', required: true, label: 'Fecha de Nacimiento' },
+  { name: 'telefono', placeholder: 'Teléfono', required: true },
+  { name: 'email', placeholder: 'Email' },
+  { name: 'direccion', placeholder: 'Dirección' },
+  { name: 'contactoEmergencia', placeholder: 'Contacto Emergencia', required: true },
+  // Y aquí para fechaAlta
+  { name: 'fechaAlta', placeholder: 'Fecha de Alta', type: 'date', label: 'Fecha de Alta' },
+].map((field) =>
+  field.type === 'date' ? (
+    <div key={field.name} style={{ display: 'flex', flexDirection: 'column' }}>
+      <label
+        htmlFor={field.name}
+        style={{ color: '#FFD700', fontSize: 12, marginBottom: 4, fontWeight: '600' }}
+      >
+        {field.label}
+      </label>
+      <input
+        id={field.name}
+        name={field.name}
+        type="date"
+        value={(form as any)[field.name]}
+        onChange={handleInputChange}
+        required={field.required}
+        style={{
+          padding: '10px',
+          borderRadius: 8,
+          border: '1px solid #333',
+          backgroundColor: '#121212',
+          color: '#FFD700',
+          fontSize: 14,
+          outline: 'none',
+        }}
+      />
+    </div>
+  ) : (
+    <input
+      key={field.name}
+      name={field.name}
+      type={field.type || 'text'}
+      placeholder={field.placeholder}
+      value={(form as any)[field.name]}
+      onChange={handleInputChange}
+      required={field.required}
+      style={{
+        padding: '10px',
+        borderRadius: 8,
+        border: '1px solid #333',
+        backgroundColor: '#121212',
+        color: '#FFD700',
+        fontSize: 14,
+        outline: 'none',
+      }}
+    />
+  )
+)}
+
+  <select
+    name="planId"
+    value={form.planId}
+    onChange={handleInputChange}
+    required
+    style={{
+      padding: '10px',
+      borderRadius: 8,
+      border: '1px solid #333',
+      backgroundColor: '#121212',
+      color: form.planId ? '#FFD700' : '#777',
+      fontSize: 14,
+      outline: 'none',
+    }}
+  >
+    <option value="">-- Seleccione plan --</option>
+    {planes.map((plan) => (
+      <option key={plan._id} value={plan._id} style={{ color: '#000' }}>
+        {plan.nombre}
+      </option>
+    ))}
+  </select>
+
+  <button
+    type="submit"
+    style={{
+      backgroundColor: '#FFA500',
+      color: '#000',
+      border: 'none',
+      borderRadius: 8,
+      padding: '12px 16px',
+      fontWeight: 'bold',
+      cursor: 'pointer',
+      gridColumn: 'span 1',
+      transition: 'background-color 0.3s',
+    }}
+  >
+    Agregar Socio
+  </button>
+</form>
+
 
         {/* FILTROS Y BUSCADOR */}
         <div

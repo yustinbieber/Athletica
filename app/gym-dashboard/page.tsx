@@ -102,14 +102,16 @@ export default function GymDashboard() {
         />
       );
       break;
-    case 'Movimientos':
-      content = (
-        <ControlPlataContent
-          gymId={userData.rol === 'admin' ? userData.id : userData.gymId!}
-          empleadoId={userData.empleadoId || ''}
-        />
-      );
-      break;
+      case 'Movimientos':
+        content = (
+          <ControlPlataContent
+            gymId={userData.rol === 'admin' ? userData.id : userData.gymId!}
+            empleadoId={userData.empleadoId || ''}
+            rol={userData.rol}
+            token={localStorage.getItem('gymToken') || ''}
+          />
+        );
+        break;      
     default:
       content = <DashboardContent gymName={userData.gymName} />;
   }

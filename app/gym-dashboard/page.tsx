@@ -78,7 +78,13 @@ export default function GymDashboard() {
   let content;
   switch (section) {
     case 'dashboard':
-      content = <DashboardContent gymName={userData.gymName} />;
+      content = (
+        <DashboardContent
+          gymName={userData.gymName}
+          gymId={userData.gymId || userData.id}
+          token={localStorage.getItem('gymToken') || ''}
+        />
+      );
       break;
     case 'planes':
       content = <PlanesContent />;
@@ -112,9 +118,15 @@ export default function GymDashboard() {
           />
         );
         break;      
-    default:
-      content = <DashboardContent gymName={userData.gymName} />;
-  }
+        default:
+          content = (
+            <DashboardContent
+              gymName={userData.gymName}
+              gymId={userData.gymId || userData.id}
+              token={localStorage.getItem('gymToken') || ''}
+            />
+          );
+      }
 
   return (
     <div style={{ display: 'flex', height: '100vh' }}>

@@ -11,6 +11,9 @@ const socioSchema = new Schema({
   planId: { type: String, required: true },
   activo: { type: Boolean, required: true, default: true },
   fechaAlta: { type: Date, required: true },
+
+  // Campo nuevo: rutina asignada
+  rutinaAsignada: { type: mongoose.Schema.Types.ObjectId, ref: 'Rutina', default: null },
 });
 
 const Socio = models.Socio || model('Socio', socioSchema);

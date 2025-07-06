@@ -10,7 +10,9 @@ import {
   FaMoneyCheckAlt,
   FaUserTie,
   FaBars,
-  FaClock
+  FaClock,
+  FaChevronDown,
+  FaChevronRight,
 } from 'react-icons/fa';
 
 interface SidebarProps {
@@ -24,32 +26,6 @@ interface SidebarProps {
   setExpanded: (val: boolean) => void;
 }
 
-const sections = [
-  {
-    title: 'General',
-    links: [
-      { id: 'dashboard', label: 'Dashboard', icon: <FaTachometerAlt /> },
-      { id: 'ingresos', label: 'Control de Ingreso', icon: <FaDoorOpen /> },
-    ],
-  },
-  {
-    title: 'Usuarios',
-    links: [
-      { id: 'planes', label: 'Planes', icon: <FaClipboardList /> },
-      { id: 'usuarios', label: 'Gestión Usuarios', icon: <FaUsers /> },
-      { id: 'porVencer', label: 'Socios por vencer', icon: <FaClock /> }, // NUEVA SECCIÓN
-    ],
-  },
-  {
-    title: 'Mercadería y Finanzas',
-    links: [
-      { id: 'mercaderia', label: 'Mercadería', icon: <FaBoxes /> },
-      { id: 'Movimientos', label: 'Control de Plata', icon: <FaMoneyCheckAlt /> },
-      { id: 'empleados', label: 'Empleados', icon: <FaUserTie /> }, // ocultar si rol === 'empleado'
-    ],
-  },
-];
-
 export default function Sidebar({
   currentSection,
   setSection,
@@ -61,6 +37,26 @@ export default function Sidebar({
   setExpanded,
 }: SidebarProps) {
   const [showConfirm, setShowConfirm] = useState(false);
+  const [usuariosOpen, setUsuariosOpen] = useState(false);
+  const [finanzasOpen, setFinanzasOpen] = useState(false);
+
+  const generalLinks = [
+    { id: 'dashboard', label: 'Dashboard', icon: <FaTachometerAlt /> },
+    { id: 'ingresos', label: 'Control de Ingreso', icon: <FaDoorOpen /> },
+  ];
+
+  const usuarioLinks = [
+    { id: 'planes', label: 'Planes', icon: <FaClipboardList /> },
+    { id: 'usuarios', label: 'Gestión Usuarios', icon: <FaUsers /> },
+    { id: 'porVencer', label: 'Socios por vencer', icon: <FaClock /> },
+    { id: 'rutinas', label: 'Rutinas', icon: <FaClipboardList /> },
+  ];
+
+  const finanzasLinks = [
+    { id: 'mercaderia', label: 'Mercadería', icon: <FaBoxes /> },
+    { id: 'Movimientos', label: 'Caja', icon: <FaMoneyCheckAlt /> },
+    { id: 'empleados', label: 'Empleados', icon: <FaUserTie /> },
+  ];
 
   function filterLinksByRole(links: { id: string; label: string; icon: JSX.Element }[]) {
     if (role === 'empleado') {
@@ -68,6 +64,43 @@ export default function Sidebar({
     }
     return links;
   }
+
+  const sectionStyle = {
+    marginBottom: 30,
+    overflow: 'hidden',
+    transition: 'max-height 0.3s ease',
+  };
+
+  const renderLinks = (links: any[]) =>
+    links.map(({ id, label, icon }) => {
+      const isActive = currentSection === id;
+      return (
+        <li key={id} style={{ marginBottom: 12 }}>
+          <button
+            onClick={() => setSection(id)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: expanded ? 'flex-start' : 'center',
+              width: '100%',
+              padding: '10px 14px',
+              borderRadius: 6,
+              color: isActive ? '#FF6B00' : '#FFF',
+              backgroundColor: isActive ? 'rgba(255, 107, 0, 0.15)' : 'transparent',
+              border: 'none',
+              cursor: 'pointer',
+              fontWeight: isActive ? 'bold' : 'normal',
+              transition: 'background-color 0.2s ease',
+              userSelect: 'none',
+            }}
+            title={!expanded ? label : undefined}
+          >
+            <span style={{ fontSize: 20, marginRight: expanded ? 12 : 0 }}>{icon}</span>
+            {expanded && label}
+          </button>
+        </li>
+      );
+    });
 
   return (
     <>
@@ -82,14 +115,14 @@ export default function Sidebar({
           padding: '20px 10px',
           boxSizing: 'border-box',
           transition: 'width 0.3s ease',
-          overflowY: 'hidden',
           position: 'fixed',
           left: 0,
           top: 0,
           zIndex: 100,
+          overflow: 'hidden',
         }}
       >
-        {/* Header: gymName + toggle */}
+        {/* Header */}
         <div
           style={{
             display: 'flex',
@@ -134,41 +167,21 @@ export default function Sidebar({
             }}
             onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'rgba(255, 107, 0, 0.2)')}
             onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
-            aria-label={expanded ? 'Cerrar menú' : 'Abrir menú'}
           >
             <FaBars />
           </button>
         </div>
 
-        {/* Info usuario */}
+        {/* Usuario info */}
         {expanded && (
           <>
             {empleadoNombre && (
-              <p
-                style={{
-                  marginTop: 0,
-                  marginBottom: 4,
-                  color: '#FFA500',
-                  fontWeight: 'bold',
-                  fontSize: 16,
-                  userSelect: 'none',
-                }}
-              >
+              <p style={{ marginTop: 0, marginBottom: 4, color: '#FFA500', fontWeight: 'bold', fontSize: 16 }}>
                 {role === 'dueño' ? 'Usuario' : 'Empleado'}: {empleadoNombre}
               </p>
             )}
             {role && (
-              <p
-                style={{
-                  marginTop: 0,
-                  marginBottom: 24,
-                  color: '#FF6B00',
-                  fontWeight: 600,
-                  fontSize: 14,
-                  fontStyle: 'italic',
-                  userSelect: 'none',
-                }}
-              >
+              <p style={{ marginTop: 0, marginBottom: 24, color: '#FF6B00', fontWeight: 600, fontSize: 14, fontStyle: 'italic' }}>
                 Rol: {role.charAt(0).toUpperCase() + role.slice(1)}
               </p>
             )}
@@ -176,118 +189,109 @@ export default function Sidebar({
         )}
 
         {/* Secciones */}
-        <div style={{ flexGrow: 1, overflowY: 'auto' }}>
-          {sections.map(({ title, links }) => {
-            const filteredLinks = filterLinksByRole(links);
-            if (filteredLinks.length === 0) return null;
-            return (
-              <div key={title} style={{ marginBottom: 30 }}>
-                {expanded && (
-                  <h3
-                    style={{
-                      marginBottom: 10,
-                      color: '#FF6B00',
-                      fontWeight: '700',
-                      fontSize: 16,
-                      textTransform: 'uppercase',
-                      userSelect: 'none',
-                    }}
-                  >
-                    {title}
-                  </h3>
-                )}
-                <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                  {filteredLinks.map(({ id, label, icon }) => {
-                    const isActive = currentSection === id;
-                    return (
-                      <li key={id} style={{ marginBottom: 12 }}>
-                        <button
-                          onClick={() => setSection(id)}
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: expanded ? 'flex-start' : 'center',
-                            width: '100%',
-                            padding: '10px 14px',
-                            borderRadius: 6,
-                            color: isActive ? '#FF6B00' : '#FFF',
-                            backgroundColor: isActive ? 'rgba(255, 107, 0, 0.15)' : 'transparent',
-                            border: 'none',
-                            cursor: 'pointer',
-                            fontWeight: isActive ? 'bold' : 'normal',
-                            transition: 'background-color 0.2s ease',
-                            userSelect: 'none',
-                          }}
-                          title={!expanded ? label : undefined}
-                        >
-                          <span style={{ fontSize: 20, marginRight: expanded ? 12 : 0 }}>
-                            {icon}
-                          </span>
-                          {expanded && label}
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Botón cerrar sesión */}
-        {expanded ? (
-          <div>
-            <button
-              onClick={() => setShowConfirm(true)}
-              title="Cerrar sesión"
-              style={{
-                backgroundColor: '#FF4040',
-                color: '#FFF',
-                border: 'none',
-                padding: '10px 14px',
-                borderRadius: 6,
-                width: '100%',
-                cursor: 'pointer',
-                textAlign: 'center',
-                fontSize: 16,
-                marginTop: 'auto',
-                userSelect: 'none',
-              }}
-            >
-              🔒 Cerrar sesión
-            </button>
+        <div
+          style={{
+            flexGrow: 1,
+            overflowY: 'auto',
+            scrollbarWidth: 'thin',
+            scrollbarColor: 'transparent transparent',
+          }}
+        >
+          {/* General - siempre visible */}
+          <div style={sectionStyle}>
+            {expanded && (
+              <h3 style={{ color: '#FF6B00', fontWeight: '700', fontSize: 16, textTransform: 'uppercase' }}>General</h3>
+            )}
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>{renderLinks(generalLinks)}</ul>
           </div>
-        ) : (
-          <div
-            style={{
-              marginTop: 'auto',
-              display: 'flex',
-              justifyContent: 'center',
-            }}
-          >
-            <button
-              onClick={() => setShowConfirm(true)}
-              title="Cerrar sesión"
+
+          {/* Usuarios - colapsable */}
+          <div style={sectionStyle}>
+            <div
+              onClick={() => setUsuariosOpen(prev => !prev)}
               style={{
-                backgroundColor: '#FF4040',
-                color: '#FFF',
-                border: 'none',
-                padding: 10,
-                borderRadius: 6,
-                cursor: 'pointer',
-                width: 40,
-                height: 40,
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: 16,
+                cursor: 'pointer',
+                marginBottom: 8,
                 userSelect: 'none',
               }}
             >
-              🔒
-            </button>
+              {expanded && (
+                <>
+                  <FaChevronRight
+                    style={{
+                      transform: usuariosOpen ? 'rotate(90deg)' : 'rotate(0)',
+                      transition: 'transform 0.2s ease',
+                      marginRight: 6,
+                    }}
+                  />
+                  <h3 style={{ color: '#FF6B00', fontWeight: 700, fontSize: 16 }}>Usuarios</h3>
+                </>
+              )}
+            </div>
+            {usuariosOpen && (
+              <ul style={{ listStyle: 'none', padding: 0, marginTop: 10 }}>{renderLinks(usuarioLinks)}</ul>
+            )}
           </div>
-        )}
+
+          {/* Finanzas - colapsable */}
+          <div style={sectionStyle}>
+            <div
+              onClick={() => setFinanzasOpen(prev => !prev)}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                cursor: 'pointer',
+                marginBottom: 8,
+                userSelect: 'none',
+              }}
+            >
+              {expanded && (
+                <>
+                  <FaChevronRight
+                    style={{
+                      transform: finanzasOpen ? 'rotate(90deg)' : 'rotate(0)',
+                      transition: 'transform 0.2s ease',
+                      marginRight: 6,
+                    }}
+                  />
+                  <h3 style={{ color: '#FF6B00', fontWeight: 700, fontSize: 16 }}>Mercadería y Finanzas</h3>
+                </>
+              )}
+            </div>
+            {finanzasOpen && (
+              <ul style={{ listStyle: 'none', padding: 0, marginTop: 10 }}>
+                {renderLinks(filterLinksByRole(finanzasLinks))}
+              </ul>
+            )}
+          </div>
+        </div>
+
+        {/* Logout */}
+        <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'center' }}>
+          <button
+            onClick={() => setShowConfirm(true)}
+            style={{
+              backgroundColor: '#FF4040',
+              color: '#FFF',
+              border: 'none',
+              padding: expanded ? '10px 14px' : 10,
+              borderRadius: 6,
+              cursor: 'pointer',
+              fontSize: 16,
+              width: expanded ? '100%' : 40,
+              height: expanded ? 'auto' : 40,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              userSelect: 'none',
+            }}
+            title="Cerrar sesión"
+          >
+            🔒 {expanded && 'Cerrar sesión'}
+          </button>
+        </div>
       </nav>
 
       {/* Modal confirmación logout */}
@@ -321,9 +325,7 @@ export default function Sidebar({
               textAlign: 'center',
             }}
           >
-            <p style={{ marginBottom: 20, fontSize: 18 }}>
-              ¿Seguro que querés cerrar sesión?
-            </p>
+            <p style={{ marginBottom: 20, fontSize: 18 }}>¿Seguro que querés cerrar sesión?</p>
             <button
               onClick={() => {
                 setShowConfirm(false);
@@ -337,7 +339,6 @@ export default function Sidebar({
                 borderRadius: 6,
                 marginRight: 12,
                 cursor: 'pointer',
-                userSelect: 'none',
               }}
             >
               Sí, cerrar sesión
@@ -351,7 +352,6 @@ export default function Sidebar({
                 padding: '10px 20px',
                 borderRadius: 6,
                 cursor: 'pointer',
-                userSelect: 'none',
               }}
             >
               Cancelar

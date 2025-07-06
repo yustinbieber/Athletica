@@ -12,6 +12,7 @@ import MercaderiaPage from '@/components/gym/Mercaderia';
 import EmpleadosContent from '@/components/gym/EmpleadosContent';
 import ControlPlataContent from '@/components/gym/ControlPlataContent';
 import PorVencerContent from '@/components/gym/PorVencerContent';
+import RutinasContent from '@/components/gym/RutinasContent';
 
 interface GymTokenPayload {
   id: string;
@@ -98,6 +99,9 @@ export default function GymDashboard() {
       case 'porVencer':
       content = <PorVencerContent />;
       break;
+      case 'rutinas':
+  content = <RutinasContent gymId={userData.gymId || userData.id} creadoPor={userData.id} />;
+  break;
     case 'mercaderia':
       content = <MercaderiaPage />;
       break;

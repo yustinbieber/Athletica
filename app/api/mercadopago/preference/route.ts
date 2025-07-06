@@ -1,4 +1,6 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
+// app/api/mercadopago/preference/route.ts
+
+import { NextResponse } from 'next/server';
 import MercadoPago from 'mercadopago';
 
 async function getAccessToken() {
@@ -21,22 +23,16 @@ async function getAccessToken() {
   return data.access_token as string;
 }
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Método no permitido' });
-  }
-
+export async function POST(req: Request) {
   try {
     const accessToken = await getAccessToken();
+    const mp = new MercadoPago({ accessToken });
 
-    const mp = new MercadoPago({
-      accessToken,
-    });
-
-    const { nombreSocio, monto } = req.body;
+    const body = await req.json();
+    const { nombreSocio, monto } = body;
 
     if (!nombreSocio || !monto) {
-      return res.status(400).json({ error: 'Faltan datos' });
+      return NextResponse.json({ error: 'Faltan datos' }, { status: 400 });
     }
 
     const preference = {
@@ -58,10 +54,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     // @ts-ignore
     const response = await mp.preferences.create(preference);
 
-
-    res.status(200).json({ init_point: response.body.init_point });
+    return NextResponse.json({ init_point: response.body.init_point });
   } catch (error) {
     console.error('Error creando preferencia:', error);
-    res.status(500).json({ error: 'Error creando preferencia' });
+    return NextResponse.json({ error: 'Error creando preferencia' }, { status: 500 });
   }
 }
